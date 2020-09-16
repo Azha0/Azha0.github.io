@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WFP网络过滤驱动分析报告 | Azha0's Space</title><meta name="description" content="该Rootkit样本是一个基于WFP框架的网络过滤驱动，在特定的网络分层中设置过滤器，对特定网络数据进行过滤。https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;Azha0&#x2F;ImgHosting@1.1&#x2F;BlogImg&#x2F;myimg&#x2F;postimg&#x2F;rootkit.jpg"><meta name="keywords" content="样本分析报告,Rootkit"><meta name="author" content="Azha0,A_zha0@163.com"><meta name="copyright" content="Azha0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/favicon.png"><link rel="canonical" href="https://azha0.github.io/2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta property="og:type" content="article"><meta property="og:title" content="WFP网络过滤驱动分析报告"><meta property="og:url" content="https://azha0.github.io/2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/"><meta property="og:site_name" content="Azha0's Space"><meta property="og:description" content="该Rootkit样本是一个基于WFP框架的网络过滤驱动，在特定的网络分层中设置过滤器，对特定网络数据进行过滤。https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;Azha0&#x2F;ImgHosting@1.1&#x2F;BlogImg&#x2F;myimg&#x2F;postimg&#x2F;rootkit.jpg"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/BlogImg/myimg/postimg/rootkit.jpg"><meta property="article:published_time" content="2020-04-01T12:00:00.000Z"><meta property="article:modified_time" content="2020-09-16T15:45:52.186Z"><meta name="twitter:card" content="summary"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  hexoversion: '5.1.1',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime: '天',
+  date_suffix: {"one_hour":"刚刚","hours":"小时前","day":"天前"},
+  copyright: {"limitCount":50,"languages":{"author":"作者: Azha0","link":"链接: ","source":"来源: Azha0's Space","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: {"bookmark":{"message_prev":"按","message_next":"键将本页加入书签"},"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  baiduPush: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+    },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isSidebar: true,
+  postUpdate: '2020-09-16 23:45:52'
+}</script><noscript><style type="text/css">
+#nav {
+  opacity: 1
+}
+.justified-gallery img {
+  opacity: 1
+}
+</style></noscript><script>var activateDarkMode = function () {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+  }
+}
+var activateLightMode = function () {
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null) {
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+  }
+}
+
+var autoChangeMode = '1'
+var t = saveToLocal.get('theme')
+if (autoChangeMode === '1') {
+  var isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+  var isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+  var isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined) {
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport) {
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour <= 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+      if (saveToLocal.get('theme') === undefined) {
+        e.matches ? activateDarkMode() : activateLightMode()
+      }
+    })
+  } else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else if (autoChangeMode === '2') {
+  now = new Date()
+  hour = now.getHours()
+  isNight = hour <= 6 || hour >= 18
+  if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode()
+} else {
+  if (t === 'dark') activateDarkMode()
+  else if (t === 'light') activateLightMode()
+}</script><meta name="generator" content="Hexo 5.1.1"></head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/avatar.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">19</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">25</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">4</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div id="body-wrap"><div id="sidebar"><i class="fas fa-arrow-right on" id="toggle-sidebar"></i><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">基本信息</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">2.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%B7%E6%9C%AC%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">样本详细分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E8%BF%87%E6%BB%A4%E5%99%A8%E7%8A%B6%E6%80%81"><span class="toc-number">3.2.</span> <span class="toc-text">检测过滤器状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E8%BF%87%E6%BB%A4%E8%A1%8C%E4%B8%BA"><span class="toc-number">3.3.</span> <span class="toc-text">主要过滤行为</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E5%90%AF%E8%BF%87%E6%BB%A4%E5%BC%95%E6%93%8E"><span class="toc-number">3.3.1.</span> <span class="toc-text">开启过滤引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%86%8CCallout"><span class="toc-number">3.3.2.</span> <span class="toc-text">注册Callout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E6%9D%80%E8%BD%AF"><span class="toc-number">3.3.3.</span> <span class="toc-text">检测杀软</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%AD%90%E5%B1%82"><span class="toc-number">3.3.4.</span> <span class="toc-text">添加子层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0Callout%E5%92%8CFilter"><span class="toc-number">3.3.5.</span> <span class="toc-text">添加Callout和Filter</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol></div></div></div><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/BlogImg/myimg/postimg/rootkit.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Azha0's Space</a></span><span id="menus"><div id="search_button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><span class="close" id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><div id="post-title"><div class="posttitle">WFP网络过滤驱动分析报告</div></div><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-04-01T12:00:00.000Z" title="发表于 2020-04-01 20:00:00">2020-04-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-09-16T15:45:52.186Z" title="更新于 2020-09-16 23:45:52">2020-09-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">891</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><center><font size =8><b>WFP网络过滤驱动分析报告</b></font></center>
+
+
+
+<h1 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h1><table>
+<thead>
+<tr>
+<th align="center">样本名称</th>
+<th align="center"><strong>qsafd_vw_1_10_0_20.sys</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>样本类型</strong></td>
+<td align="center"><strong>Rootkit</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>样本大小</strong></td>
+<td align="center"><strong>56.38 KB (57728 bytes)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>MD5</strong></td>
+<td align="center"><strong>D615E94389B927888FDCDE7D2F36BF4C</strong></td>
+</tr>
+</tbody></table>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><blockquote>
+<p>该Rootkit样本是一个基于WFP框架的网络过滤驱动，在特定的网络分层中设置过滤器，对特定网络数据进行过滤。</p>
+</blockquote>
+<h1 id="样本详细分析"><a href="#样本详细分析" class="headerlink" title="样本详细分析"></a>样本详细分析</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p><strong>初始化派遣函数</strong></p>
+<p>通过<code>memcpy</code>设置驱动的派遣函数，将所有的派遣函数都设置为<code>subMajorFunction_140004748</code>，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703201424104.png" alt="image-20200703201424104"></p>
+<p>函数<code>subMajorFunction_140004748</code>根据接受到IRP请求，进行相应的操作，由于缺少R3程序，这里便没有详细分析具体的派遣函数操作。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703201833804.png" alt="image-20200703201833804"></p>
+<p><strong>初始化设备对象和设备符号链接</strong></p>
+<p>创建名为\Device\CtrlSM的设备对象，创建名为\DosDevicse\CtrlSM的设备符号链接，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703202257655.png" alt="image-20200703202257655"></p>
+<p><strong>初始化卸载函数</strong></p>
+<p>卸载函数释放自旋锁，设备对象和符号链接，释放分配的内存池等，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703202512519.png" alt="image-20200703202512519"></p>
+<h2 id="检测过滤器状态"><a href="#检测过滤器状态" class="headerlink" title="检测过滤器状态"></a>检测过滤器状态</h2><p>调用函数<code>FwpmBfeStateGet0</code>检测过滤器的运行状态：</p>
+<ul>
+<li><p>当过滤器处于正在运行，便执行主要过滤函数<code>submain_1400026A0</code>;</p>
+</li>
+<li><p>当过滤器没有正在运行，便执行函数<code>FwpmBfeStateSubscribeChanges0</code>，当过滤器引擎状态发生改变便调用<code>subCallbackmain_1400077A8</code>函数（与<code>submain_1400026A0</code>相同）</p>
+</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703204413132.png" alt="image-20200703204413132"></p>
+<h2 id="主要过滤行为"><a href="#主要过滤行为" class="headerlink" title="主要过滤行为"></a>主要过滤行为</h2><h3 id="开启过滤引擎"><a href="#开启过滤引擎" class="headerlink" title="开启过滤引擎"></a>开启过滤引擎</h3><p>先通过函数<code>ExUuidCreate</code>初始化25个UUID（UUID用来唯一标识提供者、子层、Callout），然后在调用函数<code>FwpmEngineOpen0</code>开启过滤引擎，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703205703744.png" alt="image-20200703205703744"></p>
+<p>添加名为<code>NFSDK Provider</code>的Provider，然后再通过<code>submainFwpsCalloutRegister2_1400028E8</code>函数注册Callout，以及<code>submainFwpmFilterAdd0_140001008</code>函数添加Filter，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704124341034.png" alt="image-20200704124341034"></p>
+<h3 id="注册Callout"><a href="#注册Callout" class="headerlink" title="注册Callout"></a>注册Callout</h3><p>先调用<code>FwpmTransactionBegin0</code>开启过滤设置，然后再调用<code>subFwpsCalloutRegister2_14000284C</code>函数来注册Callout，一共注册了22个callout，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704142251282.png" alt="image-20200704142251282"></p>
+<p>注册完后，当过滤器命中设置好的规则后(后面会添加过滤规则)，便会执行上图中<code>classifyFn1</code>函数，对相应网络数据进行过滤。由于一共注册了22个callout，其中大多需要实际网络环境才能触发，调试起来比较麻烦；静态也有很多结构体指针的使用，因此短时间内无法将每个callout所执行的行为完全分析清楚。</p>
+<h3 id="检测杀软"><a href="#检测杀软" class="headerlink" title="检测杀软"></a>检测杀软</h3><p>通过查看驱动注册表项，来检测杀软的网络过滤驱动是否存在，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704151535750.png" alt="image-20200704151535750"></p>
+<h3 id="添加子层"><a href="#添加子层" class="headerlink" title="添加子层"></a>添加子层</h3><p>通过调用函数<code>FwpmSubLayerAdd0</code>分别添加NFSDK Sublayer子层和NFSDK Recv Sublayer子层，并根据检测杀软的结果来修改子层的权重（权重值决定过滤的优先级），如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704152444483.png" alt="image-20200704152444483"></p>
+<h3 id="添加Callout和Filter"><a href="#添加Callout和Filter" class="headerlink" title="添加Callout和Filter"></a>添加Callout和Filter</h3><p>通过调用函数<code>subFwpmFilterAdd0_140001420</code>将之前注册的22个Callout添加到WFP过滤引擎中，并在成功添加Callout后再添加包含相应规则的Filter。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704153418804.png" alt="image-20200704153418804"></p>
+<p>函数<code>subFwpmFilterAdd0_140001420</code>，先通过函数<code>FwpmCalloutAdd0</code>添加Callout，当添加Callout成功后便在通过函数<code>FwpmFilterAdd0</code>向系统添加一个新的过滤器对象，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704160727584.png" alt="image-20200704160727584"></p>
+<p>其中上图中的<code>FWPM_FILTER_CONDITION0_</code>结构定义了需要满足什么条件时过滤条件成立。具体结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">FWPM_FILTER_CONDITION0_</span> &#123;</span></span><br><span class="line">  GUID                 fieldKey;		<span class="comment">//GUID</span></span><br><span class="line">  FWP_MATCH_TYPE       matchType; 		<span class="comment">//指定要执行的匹配类型</span></span><br><span class="line">  FWP_CONDITION_VALUE0 conditionValue;	<span class="comment">//一个FWP_CONDITION_VALUE0结构，其中包含与该字段匹配的值。</span></span><br><span class="line">&#125; FWPM_FILTER_CONDITION0;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><blockquote>
+<p>该样本是一个典型的基于WFP框架开发的恶意Rootkit，对受害主机的特定网络数据包进行过滤，来实施恶意操作。该样本包含正常的文件签名，并且会检测系统中的安全软件进行对抗，一般难以发现。因此在日常使用中用户应注意辨别恶意软件。</p>
+</blockquote>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:A_zha0@163.com">Azha0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://azha0.github.io/2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/">https://azha0.github.io/2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://Azha0.github.io" target="_blank">Azha0's Space</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a><a class="post-meta__tags" href="/tags/Rootkit/">Rootkit</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/BlogImg/myimg/postimg/rootkit.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/04/10/03_%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/01_CVE-2017-11882/"><img class="prev-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/CVE-2017-11882.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">CVE-2017-11882漏洞分析及复现</div></div></a></div><div class="next-post pull-right"><a href="/2020/03/30/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/13_%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%99%A8%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%88%86%E6%9E%90/"><img class="next-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/BlogImg/myimg/postimg/CVE-2017-11882_2.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">公式编辑器漏洞利用样本分析</div></div></a></div></nav></article></main><footer id="footer" style="background-image: url(https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/BlogImg/myimg/postimg/rootkit.jpg)" data-type="photo"><div id="footer-wrap"><div class="copyright">&copy;2020 By Azha0</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a href="https://Azha0.github.io">blog</a>!</div></div></footer></div><section id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></section><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div><div><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

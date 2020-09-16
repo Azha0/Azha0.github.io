@@ -71,6 +71,33 @@
     
     
     <entry>
+      <title>WFP网络过滤驱动分析报告</title>
+      <link href="2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/"/>
+      <url>2020/04/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<center><font size =8><b>WFP网络过滤驱动分析报告</b></font></center><h1 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h1><table><thead><tr><th align="center">样本名称</th><th align="center"><strong>qsafd_vw_1_10_0_20.sys</strong></th></tr></thead><tbody><tr><td align="center"><strong>样本类型</strong></td><td align="center"><strong>Rootkit</strong></td></tr><tr><td align="center"><strong>样本大小</strong></td><td align="center"><strong>56.38 KB (57728 bytes)</strong></td></tr><tr><td align="center"><strong>MD5</strong></td><td align="center"><strong>D615E94389B927888FDCDE7D2F36BF4C</strong></td></tr></tbody></table><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><blockquote><p>该Rootkit样本是一个基于WFP框架的网络过滤驱动，在特定的网络分层中设置过滤器，对特定网络数据进行过滤。</p></blockquote><h1 id="样本详细分析"><a href="#样本详细分析" class="headerlink" title="样本详细分析"></a>样本详细分析</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p><strong>初始化派遣函数</strong></p><p>通过<code>memcpy</code>设置驱动的派遣函数，将所有的派遣函数都设置为<code>subMajorFunction_140004748</code>，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703201424104.png" alt="image-20200703201424104"></p><p>函数<code>subMajorFunction_140004748</code>根据接受到IRP请求，进行相应的操作，由于缺少R3程序，这里便没有详细分析具体的派遣函数操作。</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703201833804.png" alt="image-20200703201833804"></p><p><strong>初始化设备对象和设备符号链接</strong></p><p>创建名为\Device\CtrlSM的设备对象，创建名为\DosDevicse\CtrlSM的设备符号链接，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703202257655.png" alt="image-20200703202257655"></p><p><strong>初始化卸载函数</strong></p><p>卸载函数释放自旋锁，设备对象和符号链接，释放分配的内存池等，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703202512519.png" alt="image-20200703202512519"></p><h2 id="检测过滤器状态"><a href="#检测过滤器状态" class="headerlink" title="检测过滤器状态"></a>检测过滤器状态</h2><p>调用函数<code>FwpmBfeStateGet0</code>检测过滤器的运行状态：</p><ul><li><p>当过滤器处于正在运行，便执行主要过滤函数<code>submain_1400026A0</code>;</p></li><li><p>当过滤器没有正在运行，便执行函数<code>FwpmBfeStateSubscribeChanges0</code>，当过滤器引擎状态发生改变便调用<code>subCallbackmain_1400077A8</code>函数（与<code>submain_1400026A0</code>相同）</p></li></ul><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703204413132.png" alt="image-20200703204413132"></p><h2 id="主要过滤行为"><a href="#主要过滤行为" class="headerlink" title="主要过滤行为"></a>主要过滤行为</h2><h3 id="开启过滤引擎"><a href="#开启过滤引擎" class="headerlink" title="开启过滤引擎"></a>开启过滤引擎</h3><p>先通过函数<code>ExUuidCreate</code>初始化25个UUID（UUID用来唯一标识提供者、子层、Callout），然后在调用函数<code>FwpmEngineOpen0</code>开启过滤引擎，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200703205703744.png" alt="image-20200703205703744"></p><p>添加名为<code>NFSDK Provider</code>的Provider，然后再通过<code>submainFwpsCalloutRegister2_1400028E8</code>函数注册Callout，以及<code>submainFwpmFilterAdd0_140001008</code>函数添加Filter，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704124341034.png" alt="image-20200704124341034"></p><h3 id="注册Callout"><a href="#注册Callout" class="headerlink" title="注册Callout"></a>注册Callout</h3><p>先调用<code>FwpmTransactionBegin0</code>开启过滤设置，然后再调用<code>subFwpsCalloutRegister2_14000284C</code>函数来注册Callout，一共注册了22个callout，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704142251282.png" alt="image-20200704142251282"></p><p>注册完后，当过滤器命中设置好的规则后(后面会添加过滤规则)，便会执行上图中<code>classifyFn1</code>函数，对相应网络数据进行过滤。由于一共注册了22个callout，其中大多需要实际网络环境才能触发，调试起来比较麻烦；静态也有很多结构体指针的使用，因此短时间内无法将每个callout所执行的行为完全分析清楚。</p><h3 id="检测杀软"><a href="#检测杀软" class="headerlink" title="检测杀软"></a>检测杀软</h3><p>通过查看驱动注册表项，来检测杀软的网络过滤驱动是否存在，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704151535750.png" alt="image-20200704151535750"></p><h3 id="添加子层"><a href="#添加子层" class="headerlink" title="添加子层"></a>添加子层</h3><p>通过调用函数<code>FwpmSubLayerAdd0</code>分别添加NFSDK Sublayer子层和NFSDK Recv Sublayer子层，并根据检测杀软的结果来修改子层的权重（权重值决定过滤的优先级），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704152444483.png" alt="image-20200704152444483"></p><h3 id="添加Callout和Filter"><a href="#添加Callout和Filter" class="headerlink" title="添加Callout和Filter"></a>添加Callout和Filter</h3><p>通过调用函数<code>subFwpmFilterAdd0_140001420</code>将之前注册的22个Callout添加到WFP过滤引擎中，并在成功添加Callout后再添加包含相应规则的Filter。</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704153418804.png" alt="image-20200704153418804"></p><p>函数<code>subFwpmFilterAdd0_140001420</code>，先通过函数<code>FwpmCalloutAdd0</code>添加Callout，当添加Callout成功后便在通过函数<code>FwpmFilterAdd0</code>向系统添加一个新的过滤器对象，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/14_WFP%E7%BD%91%E7%BB%9C%E8%BF%87%E6%BB%A4%E9%A9%B1%E5%8A%A8%E5%88%86%E6%9E%90/image-20200704160727584.png" alt="image-20200704160727584"></p><p>其中上图中的<code>FWPM_FILTER_CONDITION0_</code>结构定义了需要满足什么条件时过滤条件成立。具体结构如下：</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">FWPM_FILTER_CONDITION0_</span> &#123;</span></span><br><span class="line">  GUID                 fieldKey;<span class="comment">//GUID</span></span><br><span class="line">  FWP_MATCH_TYPE       matchType; <span class="comment">//指定要执行的匹配类型</span></span><br><span class="line">  FWP_CONDITION_VALUE0 conditionValue;<span class="comment">//一个FWP_CONDITION_VALUE0结构，其中包含与该字段匹配的值。</span></span><br><span class="line">&#125; FWPM_FILTER_CONDITION0;</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><blockquote><p>该样本是一个典型的基于WFP框架开发的恶意Rootkit，对受害主机的特定网络数据包进行过滤，来实施恶意操作。该样本包含正常的文件签名，并且会检测系统中的安全软件进行对抗，一般难以发现。因此在日常使用中用户应注意辨别恶意软件。</p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 样本分析报告 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 样本分析报告 </tag>
+            
+            <tag> Rootkit </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>公式编辑器漏洞利用样本分析</title>
       <link href="2020/03/30/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/13_%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%99%A8%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%88%86%E6%9E%90/"/>
       <url>2020/03/30/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/13_%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%99%A8%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%88%86%E6%9E%90/</url>
@@ -131,6 +158,31 @@
     
     
     <entry>
+      <title>双机调试环境搭建</title>
+      <link href="2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+      <url>2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</url>
+      
+        <content type="html"><![CDATA[<center><font size =8><b>双机调试环境搭建</b></font></center><h1 id="0x00-WinDbg安装及符号配置"><a href="#0x00-WinDbg安装及符号配置" class="headerlink" title="0x00 WinDbg安装及符号配置"></a>0x00 WinDbg安装及符号配置</h1><h2 id="WinDbg安装"><a href="#WinDbg安装" class="headerlink" title="WinDbg安装"></a>WinDbg安装</h2><p><strong>官方版</strong></p><p>首先可以从微软官方下载WDK，WDK会自带<code>WinDbg</code>调试器。微软WDK官方下载链接：<a href="https://docs.microsoft.com/zh-cn/windows-hardware/drivers/download-the-wdk%E3%80%82%E4%B8%8B%E8%BD%BD%E5%AE%8C%E4%B9%8B%E5%90%8E%E4%B8%80%E8%B7%AF%E9%BB%98%E8%AE%A4%E4%B8%8B%E4%B8%80%E6%AD%A5%E5%8D%B3%E5%8F%AF%EF%BC%8C%E5%A6%82%E5%9B%BE%EF%BC%9A">https://docs.microsoft.com/zh-cn/windows-hardware/drivers/download-the-wdk。下载完之后一路默认下一步即可，如图：</a></p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325224210154.png" alt="image-20200325224210154"></p><p><strong>微软商城版</strong></p><p>上面下载的是WDK自带的调试器，其实在微软应用商店也是可以下载到WinDbg Preview版本的，只需要打开商城搜索<code>WinDbg Preview</code>，下载便是，并且这个版本的界面会更加舒适些。如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325224824570.png" alt="image-20200325224824570"></p><h2 id="配置符号路径"><a href="#配置符号路径" class="headerlink" title="配置符号路径"></a>配置符号路径</h2><p>按上面的步奏安装即可，安装完之后便需要配置==符号路径==。</p><p>第一步，添加<code>WinDbg</code>的路径到主<code>Path</code>环境变量中，将WinDbg的主路径<code>C:\Program Files (x86)\Windows Kits\10\Debuggers</code>，添加进环境变量<code>Path</code>中，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325230023064.png" alt="image-20200325230023064"></p><p>第二步，新建一个环境变量名为<code>_NT_SYMBOL_PATH</code>，并设置其值为：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SRV*C:\Symbol*http:&#x2F;&#x2F;msdl.microsoft.com&#x2F;download&#x2F;symbols</span><br></pre></td></tr></table></figure><p>其中路径<code>&lt;C:Symbol&gt;</code>可随意设置，看你想把下载到的符号放在那里。如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325230549052.png" alt="image-20200325230549052"></p><p>弄完上面两步，符号路径就配置好了，附加一下计算器查看一下效果。附加上计算器后，在<code>WinDbg</code>最上处便会显示配置好的符号路径，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325231049910.png" alt="image-20200325231049910"></p><h2 id="加载需要的模块符号"><a href="#加载需要的模块符号" class="headerlink" title="加载需要的模块符号"></a>加载需要的模块符号</h2><p>由于微软的符号链接服务器 <a href="http://msdl.microsoft.com/download/symbols%E8%A2%AB%E5%A2%99%E4%BA%86%EF%BC%8C%E5%9B%A0%E6%AD%A4%E8%A6%81%E4%BB%8E%E5%BE%AE%E8%BD%AF%E4%B8%8B%E8%BD%BD%E7%AC%A6%E5%8F%B7%E6%96%87%E4%BB%B6%E6%97%B6%EF%BC%8C%E9%9C%80%E8%A6%81%E5%BC%80%E4%BB%A3%E7%90%86%E3%80%82">http://msdl.microsoft.com/download/symbols被墙了，因此要从微软下载符号文件时，需要开代理。</a></p><p><strong>命令LD</strong></p><p>然后可以通过命令<code>lm</code>查看当前加载的模块以及加载的符号文件，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325231619454.png" alt="image-20200325231619454"></p><p>如若想在添加某个模块的符号文件，可使用命令<code>ld &lt;Moudle&gt;</code>来加载，例如加载Calcuator模块，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325231834557.png" alt="image-20200325231834557"></p><p><strong>symchk.exe命令行下载</strong></p><p>找到<code>WinDbg</code>的目录下，打开CMD输入</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">symchk [&#x2F;r] [&#x2F;q] [Input options] &lt;Filename&gt; [&#x2F;s &lt;SymbolPath&gt;] [options]</span><br><span class="line">symchk.exe -v  &lt;MoudleName&gt;</span><br><span class="line">symchk.exe -v  &lt;MoudleName&gt;  -s  &lt;SymbolPath&gt;</span><br><span class="line">例如：symchk.exe -v kernel32.dll -s  –s srv*&lt;Path&gt;* https:&#x2F;&#x2F;msdl.microsoft.com&#x2F;download&#x2F;symbols</span><br></pre></td></tr></table></figure><p>要下载如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325234012586.png" alt="image-20200325234012586"></p><h1 id="0x01-VirtualKD安装配置"><a href="#0x01-VirtualKD安装配置" class="headerlink" title="0x01 VirtualKD安装配置"></a>0x01 VirtualKD安装配置</h1><p>从VirtualKD官网<a href="https://sysprogs.com/legacy/virtualkd/%EF%BC%8C%E8%BF%9B%E8%A1%8C%E4%B8%8B%E8%BD%BD(%E5%8F%AA%E6%94%AF%E6%8C%81VM15.5%E4%BB%A5%E4%B8%8B%E7%89%88%E6%9C%AC,VM15.5%E4%BB%A5%E4%B8%8A%E7%9A%84%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%60VirtualKD-redux%60%E5%90%8E%E9%9D%A2%E6%9C%89%E4%BB%8B%E7%BB%8D)%E3%80%82%E4%B8%8B%E8%BD%BD%E5%90%8E%E8%A7%A3%E5%8E%8B%E5%8D%B3%E5%8F%AF%EF%BC%8C%E5%A6%82%E5%9B%BE%EF%BC%9A">https://sysprogs.com/legacy/virtualkd/，进行下载(只支持VM15.5以下版本,VM15.5以上的可以使用`VirtualKD-redux`后面有介绍)。下载后解压即可，如图：</a></p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325234341801.png" alt="image-20200325234341801"></p><p>然后将解压后的<code>target</code>文件夹，拖入虚拟机中，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200325234624826.png" alt="image-20200325234624826"></p><p>然后在虚拟机中运行<code>vminstall.exe</code>，来安装VirtualKD。安装完会提示重启，直接重启就好。</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200326082651300.png" alt="image-20200326082651300"></p><p>在重启之前，在本机上运行<code>vmmon.exe</code>（vmmon.exe调试32位虚拟机，vmmon64.exe调试64位虚拟机）。然后在配置WinDbg的路径，选中windbg的路径即可，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200326083222305.png" alt="image-20200326083222305"></p><p><strong>补充WinDbg调试器版本选择：</strong></p><blockquote><p>1.×86-based Host Computer</p><p>在x86处理器平台上，即使调试的目标操作系统是x64版本的，也应该使用x86版本的WinDhg。</p><p>2.x64-based Host Computer</p><p>在x64处理器平台上，需要按如下规则来选择版本。</p><ul><li>在分析Dump文件时（不管是用户模式Dump，还是内核模式Dump），如果Dump文件是在Windows XP及更新版本的操作系统上生成的，那么x86或x64版本的WinDbg均可使用；如果Dump文件是在Windows2000或更早版本的操作系统上生成的，就只能使用x86版本的WinDbg了。</li><li>在进行双机实时调试时，如果目标系统是Windows XP及更新版本的操作系统，那么×86或x64版本的WinDbg均可使用，WinDbg会自动适应；如果目标系统是Windows2000或更早版本的操作系统，就只能使用x86版本的WinDhg进行调试了。</li><li>在进行用户态实时调试时，如果目标程序是原生64位程序，则只能使用x64版本的WinDbg进行调试；如果目标程序是32位程序，那么既可以使用×86版本，也可以使用x64版本，但因为x86版本只能调试32位代码，所以与在x86平台上调试32位程序没有区别；如果使用x64版本，可以额外调试WOW64部分的代码，这对研究WOW64机制非常有用。不过，除了研究WOW64机制，在其他情况下还是应该直接根据目标程序的类型选择相应的WinDbg版本。</li></ul></blockquote><p>然后等虚拟机重启起来之后，在进入系统之前选择如图选项：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200326083439997.png" alt="image-20200326083439997"></p><p>就能实现用WinDbg+VirtualKD进行双击调试了，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200326083741102.png" alt="image-20200326083741102"></p><blockquote><p>注：由于VirtualKD不再维护了，因此对于VM15.5以后的版本不再适用，这里可以适用大神编写的VirtualKD-Redux版，连接为：<a href="https://github.com/4d61726b/VirtualKD-Redux%E3%80%82%E7%94%B1%E4%BA%8E%E6%98%AF%E5%BC%80%E6%BA%90%E7%9A%84%E5%9B%A0%E6%AD%A4%E5%9C%A8%E9%80%89%E6%8B%A9suffix(%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8%E9%A1%B9)%E6%97%B6%EF%BC%8C%E9%9C%80%E8%A6%81F8%E7%A6%81%E7%94%A8%E5%BC%BA%E5%88%B6%E7%AD%BE%E5%90%8D%EF%BC%8C%E4%BE%BF%E5%8F%AF%E6%AD%A3%E5%B8%B8%E4%BD%BF%E7%94%A8%E3%80%82">https://github.com/4d61726b/VirtualKD-Redux。由于是开源的因此在选择suffix(开机启动项)时，需要F8禁用强制签名，便可正常使用。</a></p></blockquote><h2 id="win10-virtual-KD-配置"><a href="#win10-virtual-KD-配置" class="headerlink" title="win10 virtual KD 配置"></a>win10 virtual KD 配置</h2><blockquote><p>近期工作需要，需要双机调试WIN10虚拟机，在调试时发现virtualKD怎么都安装不上，查了相关资料后才解决，这里简单说明记录一下。</p></blockquote><p>首先打开虚拟机的设置，选择选项中的固件类型，将<code>UEFI的启用安全引导</code>选项关闭，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.1/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/01_%E5%8F%8C%E6%9C%BA%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20200617160551014.png" alt="image-20200617160551014"></p><p>然后在开机，装virtualKD就可以进行双机调试了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工具使用 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 内核 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>APT_海莲花分析报告02</title>
       <link href="2020/02/15/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/11_%E6%B5%B7%E8%8E%B2%E8%8A%B102/"/>
       <url>2020/02/15/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/11_%E6%B5%B7%E8%8E%B2%E8%8A%B102/</url>
@@ -147,13 +199,13 @@
       
         <tags>
             
+            <tag> 远控 </tag>
+            
             <tag> 宏病毒 </tag>
             
             <tag> 样本分析报告 </tag>
             
             <tag> APT </tag>
-            
-            <tag> 远控木马 </tag>
             
             <tag> 白利用 </tag>
             
@@ -182,13 +234,13 @@
       
         <tags>
             
+            <tag> 远控 </tag>
+            
             <tag> 宏病毒 </tag>
             
             <tag> 样本分析报告 </tag>
             
             <tag> APT </tag>
-            
-            <tag> 远控木马 </tag>
             
             <tag> 白利用 </tag>
             
@@ -339,6 +391,8 @@
       
         <tags>
             
+            <tag> 远控 </tag>
+            
             <tag> 宏病毒 </tag>
             
             <tag> 奇兵计划 </tag>
@@ -346,8 +400,6 @@
             <tag> 样本分析报告 </tag>
             
             <tag> APT </tag>
-            
-            <tag> 远控木马 </tag>
             
             <tag> 非PE脚本语言样本 </tag>
             
