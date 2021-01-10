@@ -342,33 +342,6 @@
     
     
     <entry>
-      <title>VScode+Git使用说明</title>
-      <link href="2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/VScode%20Git%E4%BD%BF%E7%94%A8/"/>
-      <url>2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/VScode%20Git%E4%BD%BF%E7%94%A8/</url>
-      
-        <content type="html"><![CDATA[<p><font size =8><b>VScode Git 使用说明</b></font></p><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><blockquote><p>Git 是一个开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。</p></blockquote><h2 id="配置-Git-信息"><a href="#配置-Git-信息" class="headerlink" title="配置 Git 信息"></a>配置 Git 信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;&quot; &#x2F;&#x2F;github账户名或gitlib账户名</span><br><span class="line">git config --global user.email xxxx@163.com</span><br></pre></td></tr></table></figure><p><strong>新建本地仓库</strong></p><p>新建一个目录，然后cd到该目录下，执行命令<code>git clone</code>，如克隆我的图床：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;Github账户名&#x2F;项目名.git</span><br><span class="line"># 克隆自己的图床</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;Azha0&#x2F;ImgHosting.git</span><br></pre></td></tr></table></figure><p>然后将要上传的文件拖入克隆的目录下，我的是<code>ImgHosting</code>，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012222015618.png" alt="image-20201012222015618"></p><p>部分Git命令：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git checkout feature_1000 &#x2F;&#x2F;切换分支，看具体需求，如果是master分支便不需要切换</span><br><span class="line">git add .  &#x2F;&#x2F;添加要上传的文件 .代表当前目录的所有文件</span><br><span class="line">git status &#x2F;&#x2F;查看要上传的文件状态</span><br><span class="line">git commit -a -m &quot;First Commit&quot;  &#x2F;&#x2F; 添加描述信息</span><br><span class="line">git push origin feature_1000     &#x2F;&#x2F;上传到“feature_1000”分支</span><br></pre></td></tr></table></figure><h2 id="VScode使用Git"><a href="#VScode使用Git" class="headerlink" title="VScode使用Git"></a>VScode使用Git</h2><p>当配置好之前操作后，便可以通过VScode来使用Git管理代码，用VScode打开git所在目录或上一层都可（笔者喜欢打开git目录的上一层，这样在配置vscode相关选项不会涉及到同步问题），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012222952242.png" alt="image-20201012222952242"></p><p>然后再解决冲突，选中上图右侧红框标记的选项，然后先添加本地缓冲（步骤1），再输入<code>Commit</code>（步骤2），最后再将缓冲数据进行提交（步骤3），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012223726749.png" alt="image-20201012223726749"></p><p>上一步完成的只是将缓冲数据保存在本地，代码仓库（Github）上的代码并没有得到更行，还需要将本地缓冲进行推送（步骤4），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012224500417.png" alt="image-20201012224500417"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 工具使用 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Git </tag>
-            
-            <tag> VScode </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>VScode+Python环境配置</title>
       <link href="2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/Python%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%8F%8A%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
       <url>2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/Python%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%8F%8A%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
@@ -385,9 +358,36 @@
       
         <tags>
             
+            <tag> Python </tag>
+            
             <tag> VScode </tag>
             
-            <tag> Python </tag>
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>VScode+Git使用说明</title>
+      <link href="2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/VScode%20Git%E4%BD%BF%E7%94%A8/"/>
+      <url>2020/02/25/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/VScode%20Git%E4%BD%BF%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<p><font size =8><b>VScode Git 使用说明</b></font></p><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><blockquote><p>Git 是一个开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。</p></blockquote><h2 id="配置-Git-信息"><a href="#配置-Git-信息" class="headerlink" title="配置 Git 信息"></a>配置 Git 信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;&quot; &#x2F;&#x2F;github账户名或gitlib账户名</span><br><span class="line">git config --global user.email xxxx@163.com</span><br></pre></td></tr></table></figure><p><strong>新建本地仓库</strong></p><p>新建一个目录，然后cd到该目录下，执行命令<code>git clone</code>，如克隆我的图床：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;Github账户名&#x2F;项目名.git</span><br><span class="line"># 克隆自己的图床</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;Azha0&#x2F;ImgHosting.git</span><br></pre></td></tr></table></figure><p>然后将要上传的文件拖入克隆的目录下，我的是<code>ImgHosting</code>，如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012222015618.png" alt="image-20201012222015618"></p><p>部分Git命令：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git checkout feature_1000 &#x2F;&#x2F;切换分支，看具体需求，如果是master分支便不需要切换</span><br><span class="line">git add .  &#x2F;&#x2F;添加要上传的文件 .代表当前目录的所有文件</span><br><span class="line">git status &#x2F;&#x2F;查看要上传的文件状态</span><br><span class="line">git commit -a -m &quot;First Commit&quot;  &#x2F;&#x2F; 添加描述信息</span><br><span class="line">git push origin feature_1000     &#x2F;&#x2F;上传到“feature_1000”分支</span><br></pre></td></tr></table></figure><h2 id="VScode使用Git"><a href="#VScode使用Git" class="headerlink" title="VScode使用Git"></a>VScode使用Git</h2><p>当配置好之前操作后，便可以通过VScode来使用Git管理代码，用VScode打开git所在目录或上一层都可（笔者喜欢打开git目录的上一层，这样在配置vscode相关选项不会涉及到同步问题），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012222952242.png" alt="image-20201012222952242"></p><p>然后再解决冲突，选中上图右侧红框标记的选项，然后先添加本地缓冲（步骤1），再输入<code>Commit</code>（步骤2），最后再将缓冲数据进行提交（步骤3），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012223726749.png" alt="image-20201012223726749"></p><p>上一步完成的只是将缓冲数据保存在本地，代码仓库（Github）上的代码并没有得到更行，还需要将本地缓冲进行推送（步骤4），如图：</p><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/04_git%E4%BD%BF%E7%94%A8/image-20201012224500417.png" alt="image-20201012224500417"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工具使用 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VScode </tag>
+            
+            <tag> Git </tag>
             
         </tags>
       
